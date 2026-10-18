@@ -1,0 +1,11 @@
+# build leftovers
+__pycache__/
+*.py[cod]
+
+# generated audio (regenerate with tools/generate_lofi.py)
+*.wav
+
+# editors / OS
+*.bak
+*.swp
+.DS_Store

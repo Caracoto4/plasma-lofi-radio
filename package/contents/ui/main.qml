@@ -1,0 +1,58 @@
+import QtQuick
+import QtQuick.Layouts
+import org.kde.plasma.plasmoid
+import org.kde.plasma.core as PlasmaCore
+
+import "components" as Components
+
+PlasmoidItem {
+    id: root
+
+    preferredRepresentation: fullRepresentation
+
+    /// The one radio for the whole widget: a QML singleton, so the desktop
+    /// card, the panel icon and the popup all share a single connection.
+    readonly property Components.StreamPlayer engine: Components.StreamPlayer
+
+    readonly property bool inPanel: plasmoid.location === PlasmaCore.Types.TopEdge
+                                    || plasmoid.location === PlasmaCore.Types.LeftEdge
+                                    || plasmoid.location === PlasmaCore.Types.RightEdge
+                                    || plasmoid.location === PlasmaCore.Types.BottomEdge
+
+    fullRepresentation: Item {
+        implicitWidth: 296
+        implicitHeight: 452
+        Layout.preferredWidth: implicitWidth
+        Layout.preferredHeight: implicitHeight
+        Layout.minimumWidth: 240
+        Layout.minimumHeight: 380
+
+        Components.PlayerCard {
+            anchors.fill: parent
+            engine: root.engine
+            drawBackground: !root.inPanel
+        }
+    }
+
+    compactRepresentation: Item {
+        implicitWidth: 34
+        implicitHeight: 34
+
+        // a mirror only: no engine and no second connection to the stream
+        Components.PlayerCard {
+            anchors.fill: parent
+            compact: true
+            drawBackground: false
+            previewActive: true
+            previewPlaying: root.engine.playing
+            previewTitle: root.engine.title
+            previewArtist: root.engine.artist
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton
+            onClicked: root.expanded = !root.expanded
+        }
+    }
+}

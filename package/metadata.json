@@ -1,0 +1,21 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Koda"
+            }
+        ],
+        "Category": "Multimedia",
+        "Description": "A cute little lofi player with a spinning vinyl, an equalizer and live track titles from lofiradio.ru",
+        "Description[ru]": "Милый маленький lofi-плеер с крутящейся пластинкой, эквалайзером и живыми названиями треков с lofiradio.ru",
+        "Icon": "media-optical-audio",
+        "Id": "org.koda.lofiplayer",
+        "License": "MIT",
+        "Name": "Lofi Player",
+        "Name[ru]": "Lofi-плеер",
+        "Version": "2.0.0",
+        "Website": "https://lofiradio.ru"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

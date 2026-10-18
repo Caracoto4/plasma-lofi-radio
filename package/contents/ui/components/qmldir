@@ -1,0 +1,4 @@
+module org.koda.lofiplayer
+
+singleton StreamPlayer 1.0 StreamPlayer.qml
+PlayerCard 1.0 PlayerCard.qml
