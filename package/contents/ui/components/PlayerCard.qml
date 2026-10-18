@@ -1,30 +1,19 @@
-// Lofi Player — the visual card.
-//
-// Deliberately independent of Plasma, so it can be loaded on its own with
-// qml6 for quick visual iteration.
 import QtQuick
 import org.kde.kirigami as Kirigami
 
 Item {
     id: card
 
-    // ---- public API -------------------------------------------------------
-    /// The shared radio engine (the StreamPlayer singleton). Without it the
-    /// card is a pure picture, which is exactly what the panel mirror wants.
     property var engine: null
 
     property bool compact: false
-    /// used by the offscreen preview harness to render a fixed state
     property bool previewActive: false
     property bool previewPlaying: true
     property string previewTitle: ""
     property string previewArtist: ""
 
-    /// false inside a panel, where Plasma already draws a background
     property bool drawBackground: true
 
-    /// The plasmoid hands over the StreamPlayer singleton. Without one the card
-    /// renders as a still picture with safe defaults.
     readonly property var stream: engine !== null
                                   ? engine
                                   : ({
@@ -40,14 +29,11 @@ Item {
     readonly property bool buffering: previewActive ? false : stream.buffering
     readonly property string trackTitle: previewActive ? previewTitle : stream.title
     readonly property string trackArtist: previewActive ? previewArtist : stream.artist
-    /// mirrored so the volume binding stays reactive
     property real volume: stream.volume
 
     implicitWidth: 296
     implicitHeight: 452
 
-    // ---- equalizer --------------------------------------------------------
-    // Decorative, but a smoothed random walk reads as music rather than noise.
     property var eqBars: [0.20, 0.36, 0.24, 0.42, 0.30, 0.46, 0.26, 0.32]
     property var eqTargets: [0.20, 0.36, 0.24, 0.42, 0.30, 0.46, 0.26, 0.32]
 
@@ -71,7 +57,6 @@ Item {
         onTriggered: card.stepEqualizer()
     }
 
-    // ---- card background --------------------------------------------------
     Rectangle {
         id: backdrop
         anchors.fill: parent
@@ -94,7 +79,6 @@ Item {
         border.width: 1
         border.color: Qt.rgba(1, 1, 1, 0.09)
 
-        // warm glow that breathes with the music
         Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width * 0.82
@@ -111,7 +95,6 @@ Item {
             }
         }
 
-        // soft highlight along the top edge
         Rectangle {
             anchors.left: parent.left
             anchors.right: parent.right
@@ -132,14 +115,12 @@ Item {
         }
     }
 
-    // ---- layout -----------------------------------------------------------
     Column {
         id: layout
         anchors.fill: parent
         anchors.margins: card.compact ? 0 : 18
         spacing: card.compact ? 0 : 12
 
-        // ---------------------------------------------------------------- header
         Item {
             width: parent.width
             height: 18
@@ -191,20 +172,15 @@ Item {
             }
         }
 
-        // ----------------------------------------------------------------- vinyl
         Item {
             id: vinylArea
             width: parent.width
             height: card.compact ? parent.height : 176
 
-            // NB: referenced through the id on purpose — a bare `parent` inside
-            // a binding on this item resolves to the enclosing layout, not to
-            // the item itself.
             readonly property real discSize: card.compact
                                              ? Math.min(vinylArea.width, vinylArea.height) - 2
                                              : Math.min(vinylArea.width, vinylArea.height) - 10
 
-            // platter shadow
             Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
@@ -221,7 +197,6 @@ Item {
                 height: width
                 anchors.centerIn: parent
 
-                // ---- spinning record ----
                 Item {
                     id: disc
                     anchors.fill: parent
@@ -239,7 +214,6 @@ Item {
                         id: discCanvas
                         anchors.fill: parent
                         antialiasing: true
-                        // the record only needs painting when its size changes
                         onWidthChanged: requestPaint()
                         onHeightChanged: requestPaint()
                         onPaint: {
@@ -248,7 +222,6 @@ Item {
                             var rMax = c - 1;
                             ctx.reset();
 
-                            // record body
                             var body = ctx.createRadialGradient(c, c * 0.72, rMax * 0.1, c, c, rMax);
                             body.addColorStop(0.0, "#241e31");
                             body.addColorStop(0.45, "#12101a");
@@ -258,7 +231,6 @@ Item {
                             ctx.fillStyle = body;
                             ctx.fill();
 
-                            // grooves: uneven spacing keeps it from looking printed
                             if (!card.compact) {
                                 var r = rMax * 0.40;
                                 var k = 0;
@@ -273,7 +245,6 @@ Item {
                                     k++;
                                 }
 
-                                // the wide band between grooves and label
                                 ctx.beginPath();
                                 ctx.arc(c, c, rMax * 0.375, 0, 2 * Math.PI);
                                 ctx.strokeStyle = "rgba(255,255,255,0.10)";
@@ -281,7 +252,6 @@ Item {
                                 ctx.stroke();
                             }
 
-                            // sheen sweeping across the record
                             var sheen = ctx.createLinearGradient(0, 0, width, height);
                             sheen.addColorStop(0.0, "rgba(255,255,255,0.0)");
                             sheen.addColorStop(0.42, "rgba(255,255,255,0.10)");
@@ -293,7 +263,6 @@ Item {
                             ctx.fillStyle = sheen;
                             ctx.fill();
 
-                            // rim light
                             ctx.beginPath();
                             ctx.arc(c, c, rMax - 0.5, 0, 2 * Math.PI);
                             ctx.strokeStyle = "rgba(255,255,255,0.14)";
@@ -302,7 +271,6 @@ Item {
                         }
                     }
 
-                    // ---- centre label ----
                     Rectangle {
                         id: label
                         anchors.centerIn: parent
@@ -347,7 +315,6 @@ Item {
                         }
                     }
 
-                    // spindle hole
                     Rectangle {
                         anchors.centerIn: parent
                         width: Math.max(6, parent.width * 0.035)
@@ -359,12 +326,10 @@ Item {
                     }
                 }
 
-                // ---- tonearm ----
                 Item {
                     id: arm
                     anchors.fill: parent
                     visible: !card.compact
-                    // pivot at the top-right, the arm reaches towards the label
                     transformOrigin: Item.TopRight
                     rotation: card.playing ? 0 : -13
                     Behavior on rotation {
@@ -409,7 +374,6 @@ Item {
             }
         }
 
-        // ------------------------------------------------------------- equalizer
         Item {
             id: eq
             width: parent.width
@@ -452,7 +416,6 @@ Item {
             }
         }
 
-        // ------------------------------------------------------------------ info
         Item {
             width: parent.width
             height: 40
@@ -502,7 +465,6 @@ Item {
             }
         }
 
-        // -------------------------------------------------------------- controls
         Item {
             width: parent.width
             height: 44
@@ -615,7 +577,6 @@ Item {
             }
         }
 
-        // --------------------------------------------------------------- volume
         Row {
             width: parent.width
             spacing: 8
@@ -692,7 +653,6 @@ Item {
             }
         }
 
-        // keeps the card balanced when it is stretched taller than its content
         Item {
             width: 1
             height: 12

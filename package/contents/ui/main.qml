@@ -10,8 +10,6 @@ PlasmoidItem {
 
     preferredRepresentation: fullRepresentation
 
-    /// The one radio for the whole widget: a QML singleton, so the desktop
-    /// card, the panel icon and the popup all share a single connection.
     readonly property Components.StreamPlayer engine: Components.StreamPlayer
 
     readonly property bool inPanel: plasmoid.location === PlasmaCore.Types.TopEdge
@@ -38,7 +36,6 @@ PlasmoidItem {
         implicitWidth: 34
         implicitHeight: 34
 
-        // a mirror only: no engine and no second connection to the stream
         Components.PlayerCard {
             anchors.fill: parent
             compact: true
