@@ -128,7 +128,7 @@ package/                     the Plasma package (this is what kpackagetool6 inst
   contents/ui/components/
     StreamPlayer.qml         QML singleton: MediaPlayer, stations, title polling
     PlayerCard.qml           the visual card (Plasma-independent, qml6-loadable)
-  contents/audio/            generated lofi loops shipped with the package
+  contents/audio/            generated lofi loops (see note below)
 helper/
   lofi-nowplaying.py         Icecast metadata -> localhost JSON
   lofi-nowplaying.service    systemd user unit
@@ -149,6 +149,12 @@ low-pass filter. Pure `math`, `wave` and `struct`, no dependencies:
 ```bash
 python3 tools/generate_lofi.py     # writes into package/contents/audio
 ```
+
+Note: the current version of the widget streams lofiradio.ru and does not play
+these loops — they are leftovers from the first iteration, kept as a starting
+point if you want to add an offline mode. They cost ~700 KB in the package; feel
+free to delete `package/contents/audio/` and the generator call above if you do
+not need them.
 
 ## Troubleshooting
 
