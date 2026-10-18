@@ -1,43 +1,38 @@
-# Lofi Player — a Plasma 6 widget
+# Lofi Player — виджет для KDE Plasma 6
 
-A small, self-contained lofi radio widget for the KDE Plasma desktop: a spinning
-vinyl record, a tonearm that lifts when you pause, an animated equalizer and the
-**live track title** of whatever [lofiradio.ru](https://lofiradio.ru) is playing
-right now.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![KDE Plasma 6](https://img.shields.io/badge/KDE%20Plasma-6.0%2B-blue)](https://kde.org/plasma-desktop/)
+[![Qt 6](https://img.shields.io/badge/Qt-6-green)](https://www.qt.io/)
 
-![Lofi Player](preview.png)
+Компактный виджет для рабочего стола KDE Plasma, который позволяет слушать lo-fi радио прямо с рабочего стола. Вращающаяся виниловая пластинка, тонарм, который поднимается при паузе, анимированный эквалайзер и живое отображение названия трека — всё это в одном виджете.
 
-## Features
+![Скриншот виджета](preview.png)
 
-- **Plays the stream** straight from `live.lofiradio.ru` via QtMultimedia — no
-  external player, no browser tab. Two stations: *lofi hip hop* (128 kbps) and
-  *lofi chill* (96 kbps).
-- **Live track titles.** Icecast carries the song name in-band as
-  `StreamTitle='Artist - Title'`, which Qt's FFmpeg backend does not expose.
-  A tiny stdlib-only helper reads it off the socket and serves it as JSON on
-  `127.0.0.1`, so the widget can show what is playing.
-- **Hand-drawn visuals** — the record, its grooves and the equalizer are QML
-  `Canvas` code, not images. Nothing to download, nothing to theme.
-- **Marquee title** that scrolls when the name does not fit.
-- **Auto-reconnect** if the stream drops, and a volume slider.
-- Works both as a desktop widget (296×452) and as a **panel icon** that mirrors
-  the same playback state.
-- The stream engine is a QML *singleton*, so the desktop card, the panel icon
-  and the popup all share a single `MediaPlayer` and one network connection.
+## Возможности
 
-## Requirements
+- **Прямая трансляция.** Воспроизведение потока с `live.lofiradio.ru` через QtMultimedia. Не требует внешнего плеера или вкладки браузера. Доступны две станции: _lofi hip hop_ (128 kbps) и _lofi chill_ (96 kbps).
+- **Живые названия треков.** Icecast передаёт название песни в формате `StreamTitle='Artist - Title'`, который бэкенд FFmpeg в Qt не предоставляет. Небольшой вспомогательный скрипт на Python (только стандартная библиотека) читает метаданные из сокета и отдаёт их в формате JSON на `127.0.0.1`, чтобы виджет мог показывать текущий трек.
+- **Визуализация ручной работы.** Пластинка, её бороздки и эквалайзер нарисованы кодом QML `Canvas`, а не изображениями. Ничего не нужно скачивать или настраивать.
+- **Бегущая строка.** Название трека прокручивается, если не помещается в отведённое место.
+- **Автопереподключение.** Если поток прерывается, виджет автоматически восстанавливает соединение. Также есть регулятор громкости.
+- **Два режима.** Работает как виджет на рабочем столе (296×452) и как иконка на панели, которая отражает состояние воспроизведения.
+- **Единый движок.** Потоковый движок реализован как QML _singleton_, поэтому карточка на рабочем столе, иконка на панели и всплывающее окно используют один `MediaPlayer` и одно сетевое соединение.
 
-| | |
-|---|---|
-| KDE Plasma | 6.0 or newer |
-| Qt | Qt 6 with `qt6-multimedia` (the FFmpeg backend) |
-| Kirigami | `kirigami` QML module (pulled in by `plasma-workspace`) |
-| Python | 3.8+ — helper only, standard library only, no pip packages |
-| systemd | optional, but recommended to keep the helper running |
+## Требования
 
-Tested on Arch Linux with Plasma 6.7.5, Qt 6.11 and Python 3.14.
+| Компонент | Версия / Примечание |
+| :--- | :--- |
+| **KDE Plasma** | 6.0 или новее |
+| **Qt** | Qt 6 с `qt6-multimedia` (бэкенд FFmpeg) |
+| **Kirigami** | QML-модуль `kirigami` (устанавливается вместе с `plasma-workspace`) |
+| **Python** | 3.8+ — только для вспомогательного скрипта, только стандартная библиотека, без pip-пакетов |
+| **systemd** | Опционально, но рекомендуется для постоянной работы вспомогательного скрипта |
 
-## Install
+> Проверено на Arch Linux с Plasma 6.7.5, Qt 6.11 и Python 3.14.
+
+## Установка
+
+### Автоматическая установка (рекомендуется)
 
 ```bash
 git clone https://github.com/Caracoto4/plasma-lofi-radio.git
@@ -45,57 +40,53 @@ cd plasma-lofi-radio
 ./install.sh
 ```
 
-Everything is installed into your home directory, so **no root is required**:
+Скрипт устанавливает всё в домашнюю директорию, поэтому **права root не требуются**:
 
-- `~/.local/share/plasma/plasmoids/org.koda.lofiplayer` — the widget
-- `~/.local/share/lofiplayer/lofi-nowplaying.py` — the track-title helper
-- `~/.config/systemd/user/lofi-nowplaying.service` — the helper's user service
+- `~/.local/share/plasma/plasmoids/org.koda.lofiplayer` — виджет
+- `~/.local/share/lofiplayer/lofi-nowplaying.py` — вспомогательный скрипт для названий треков
+- `~/.config/systemd/user/lofi-nowplaying.service` — пользовательский сервис для скрипта
 
-Then add the widget: right-click the desktop or panel → **Add Widgets…** →
-**Lofi Player**.
+После установки добавьте виджет: щёлкните правой кнопкой мыши по рабочему столу или панели → **Добавить виджеты…** → **Lofi Player**.
 
-If it does not show up in the list, restart the shell:
+Если виджет не появился в списке, перезапустите оболочку:
 
 ```bash
 systemctl --user restart plasma-plasmashell.service
 ```
 
-### Manual install
+### Ручная установка
 
-<details>
-<summary>Without the script</summary>
+Если вы предпочитаете устанавливать вручную, выполните следующие команды:
 
 ```bash
-# the widget
+# Установка виджета
 kpackagetool6 --type Plasma/Applet --install ./package
-# ...or, to update an existing installation
+
+# ...или обновление уже установленного виджета
 kpackagetool6 --type Plasma/Applet --upgrade ./package
 
-# the helper
+# Установка вспомогательного скрипта и сервиса
 install -Dm755 helper/lofi-nowplaying.py ~/.local/share/lofiplayer/lofi-nowplaying.py
 install -Dm644 helper/lofi-nowplaying.service ~/.config/systemd/user/lofi-nowplaying.service
 systemctl --user daemon-reload
 systemctl --user enable --now lofi-nowplaying.service
 ```
 
-</details>
-
-## Uninstall
+## Удаление
 
 ```bash
 ./uninstall.sh
 ```
 
-The widget instance already placed on your desktop or panel has to be removed by
-hand: right-click it → **Remove Widget**.
+Экземпляр виджета, уже размещённый на рабочем столе или панели, необходимо удалить вручную: щёлкните по нему правой кнопкой мыши → **Удалить виджет**.
 
-## The helper
+## Вспомогательный скрипт `lofi-nowplaying.py`
 
-`lofi-nowplaying.py` keeps one long-lived connection to the Icecast stream,
-skips the audio bytes, and publishes every metadata block it sees:
+Скрипт поддерживает одно долгоживущее соединение с потоком Icecast, пропускает аудиобайты и публикует каждый блок метаданных, который видит:
 
-```
+```json
 GET http://127.0.0.1:8731/nowplaying.json
+
 {
   "raw": "dryhope - Shade",
   "artist": "dryhope",
@@ -107,78 +98,83 @@ GET http://127.0.0.1:8731/nowplaying.json
 }
 ```
 
-It binds to `127.0.0.1` only, tries ports `8731`, `8732`, `8733` in order, and
-answers `GET /health` with `ok`. It reconnects on its own with exponential
-backoff.
+Скрипт слушает только `127.0.0.1`, пытается использовать порты `8731`, `8732`, `8733` по порядку и отвечает `ok` на `GET /health`. При обрыве соединения переподключается с экспоненциальной задержкой.
+
+Проверка статуса и логов:
 
 ```bash
 systemctl --user status lofi-nowplaying
 journalctl --user -u lofi-nowplaying -f
 ```
 
-The widget polls it every 2 seconds. **Audio does not go through the helper** —
-if the helper is down you still get music, just without track titles.
+Виджет опрашивает скрипт каждые 2 секунды.
 
-## Repository layout
+> **Важно:** аудио не проходит через вспомогательный скрипт. Если скрипт не работает, музыка всё равно будет играть, но без отображения названий треков.
 
-```
-package/                     the Plasma package (this is what kpackagetool6 installs)
-  metadata.json              id, name, version, category
-  contents/ui/main.qml       applet: full representation + panel mirror
-  contents/ui/components/
-    StreamPlayer.qml         QML singleton: MediaPlayer, stations, title polling
-    PlayerCard.qml           the visual card (Plasma-independent, qml6-loadable)
-  contents/audio/            generated lofi loops (see note below)
+## Структура репозитория
+
+```text
+package/                          Пакет Plasma (устанавливается через kpackagetool6)
+├── metadata.json                 id, имя, версия, категория
+├── contents/ui/main.qml          Апплет: полное представление + зеркало для панели
+├── contents/ui/components/
+│   ├── StreamPlayer.qml          QML-синглтон: MediaPlayer, станции, опрос названий
+│   └── PlayerCard.qml            Визуальная карточка (независима от Plasma, загружается через qml6)
+└── contents/audio/               Сгенерированные lo-fi лупы (см. примечание ниже)
+
 helper/
-  lofi-nowplaying.py         Icecast metadata -> localhost JSON
-  lofi-nowplaying.service    systemd user unit
+├── lofi-nowplaying.py            Метаданные Icecast -> JSON на localhost
+└── lofi-nowplaying.service       Юнит systemd для пользователя
+
 tools/
-  generate_lofi.py           procedural lofi generator (stdlib only)
+└── generate_lofi.py              Процедурный генератор lo-fi (только stdlib)
+
 install.sh, uninstall.sh
 ```
 
-`PlayerCard.qml` deliberately imports nothing from Plasma except Kirigami, so you
-can iterate on the look with a plain `qml6` run instead of restarting plasmashell.
+`PlayerCard.qml` намеренно не импортирует ничего из Plasma, кроме Kirigami, поэтому вы можете отлаживать внешний вид с помощью обычного `qml6`, не перезапуская plasmashell.
 
-### Generating your own loops
+### Генерация собственных лупов
 
-`tools/generate_lofi.py` writes three loopable 16-bit WAV files — soft detuned
-chords, a mellow bass, a gentle kick and vinyl crackle through a one-pole
-low-pass filter. Pure `math`, `wave` and `struct`, no dependencies:
+`tools/generate_lofi.py` создаёт три зацикленных 16-битных WAV-файла: мягкие расстроенные аккорды, приглушённый бас, лёгкий удар и виниловый треск, пропущенные через фильтр низких частот. Используются только модули `math`, `wave` и `struct`, никаких зависимостей:
 
 ```bash
-python3 tools/generate_lofi.py     # writes into package/contents/audio
+python3 tools/generate_lofi.py
+# Записывает файлы в package/contents/audio
 ```
 
-Note: the current version of the widget streams lofiradio.ru and does not play
-these loops — they are leftovers from the first iteration, kept as a starting
-point if you want to add an offline mode. They cost ~700 KB in the package; feel
-free to delete `package/contents/audio/` and the generator call above if you do
-not need them.
+> **Примечание:** текущая версия виджета транслирует `lofiradio.ru` и **не использует эти лупы**. Они остались от первой итерации и сохранены как отправная точка для добавления офлайн-режима. Они занимают около 700 КБ в пакете; можете удалить `package/contents/audio/` и вызов генератора, если они вам не нужны.
 
-## Troubleshooting
+## Решение проблем
 
-**No track titles, but music plays.**
-The helper is not reachable. Check `systemctl --user status lofi-nowplaying` and
-`curl http://127.0.0.1:8731/nowplaying.json`. Note that lofiradio.ru sometimes
-broadcasts a station jingle instead of a song name; the widget shows whatever
-the stream reports.
+**Нет названий треков, но музыка играет.**
 
-**Nothing plays at all.**
-Qt 6 needs the FFmpeg backend for MP3-over-HTTP. Make sure `qt6-multimedia` is
-installed and that `QT_MEDIA_BACKEND` is not forced to something else. Check the
-Plasma log: `journalctl --user -u plasma-plasmashell -f`.
+Вспомогательный скрипт недоступен. Проверьте `systemctl --user status lofi-nowplaying` и `curl http://127.0.0.1:8731/nowplaying.json`. Учтите, что `lofiradio.ru` иногда транслирует джингл станции вместо названия песни; виджет показывает то, что сообщает поток.
 
-**The widget is missing from "Add Widgets…".**
-`kpackagetool6 --type Plasma/Applet --list` should show `org.koda.lofiplayer`.
-If it does, restart plasmashell (see above).
+**Ничего не воспроизводится.**
 
-**A "port busy" loop in the helper log.**
-Something else took 8731–8733. Both the helper and the widget walk the same
-three ports, so it will still work; if all three are taken, edit `HTTP_PORTS`
-and `nowPlayingPorts` in the two files.
+Qt 6 требует бэкенд FFmpeg для MP3-over-HTTP. Убедитесь, что установлен `qt6-multimedia` и что переменная `QT_MEDIA_BACKEND` не принудительно установлена в другое значение. Проверьте лог Plasma:
 
-## Credits
+```bash
+journalctl --user -u plasma-plasmashell -f
+```
 
-- Stream: [lofiradio.ru](https://lofiradio.ru) — all music is theirs.
-- Code: MIT, see [LICENSE](LICENSE).
+**Виджет отсутствует в списке «Добавить виджеты…».**
+
+Команда `kpackagetool6 --type Plasma/Applet --list` должна показывать `org.koda.lofiplayer`. Если показывает, перезапустите plasmashell (см. выше).
+
+**В логе вспомогательного скрипта цикл «port busy».**
+
+Что-то другое заняло порты 8731–8733. И скрипт, и виджет перебирают одни и те же три порта, поэтому всё должно работать; если заняты все три, отредактируйте `HTTP_PORTS` и `nowPlayingPorts` в двух файлах.
+
+## Участие в проекте
+
+Если вы нашли ошибку или хотите предложить улучшение, создайте [Issue](https://github.com/Caracoto4/plasma-lofi-radio/issues) или отправьте Pull Request.
+
+## Лицензия
+
+Код распространяется под лицензией **MIT**. Подробности в файле [LICENSE](https://github.com/Caracoto4/plasma-lofi-radio/blob/main/LICENSE).
+
+## Благодарности
+
+- **Поток**: [lofiradio.ru](https://lofiradio.ru) — вся музыка принадлежит им.
