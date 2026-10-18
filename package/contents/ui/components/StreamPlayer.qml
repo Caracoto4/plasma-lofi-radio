@@ -1,12 +1,3 @@
-// Lofi Player — the stream engine (no visuals).
-//
-// A QML singleton, so however many times plasmashell instantiates the applet
-// (desktop widget, panel popup, configuration dialog) there is still exactly
-// one MediaPlayer and one connection to lofiradio.ru.
-//
-// Audio comes from QtMultimedia. Track titles come from the `lofi-nowplaying`
-// helper on localhost, because Qt's FFmpeg backend does not expose Icecast's
-// in-band StreamTitle.
 pragma Singleton
 
 import QtQuick
@@ -15,7 +6,6 @@ import QtMultimedia
 Item {
     id: engine
 
-    // ---- public API -------------------------------------------------------
     readonly property var stations: [
         {
             name: qsTr("lofi hip hop"),
@@ -37,17 +27,12 @@ Item {
     property string artist: ""
     property string stationName: ""
     property string lastError: ""
-    /// mirrors the audio output so QML bindings stay reactive
     property real volume: 0.75
 
-    /// Emitted whenever a new song starts.
     signal trackChanged()
 
     property int reconnectCount: 0
 
-    // ---- track titles -----------------------------------------------------
-    /// The helper prefers 8731 but moves on when that port is taken, so the
-    /// widget walks the same short list.
     readonly property var nowPlayingPorts: [8731, 8732, 8733]
     property int nowPlayingPortIndex: 0
     property string lastRaw: ""
@@ -118,7 +103,6 @@ Item {
         }
     }
 
-    /// 0 = helper reachable, 1 = not available
     property int nowPlayingState: 1
 
     Timer {
@@ -129,7 +113,6 @@ Item {
         onTriggered: engine.readNowPlaying()
     }
 
-    // ---- audio ------------------------------------------------------------
     function toggle() {
         if (playing)
             player.pause();
@@ -173,7 +156,6 @@ Item {
             }
         }
         function onMediaStatusChanged() {
-            // a live stream should never end; if it does, come straight back
             if (player.mediaStatus === MediaPlayer.EndOfMedia
                     || player.mediaStatus === MediaPlayer.InvalidMedia
                     || player.mediaStatus === MediaPlayer.StalledMedia)
@@ -195,7 +177,6 @@ Item {
             reconnectTimer.restart();
     }
 
-    // Infinite playback: if the stream drops, reconnect after a short pause.
     Timer {
         id: reconnectTimer
         interval: 2500

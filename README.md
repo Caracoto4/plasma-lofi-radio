@@ -118,8 +118,9 @@ package/                          Пакет Plasma (устанавливает�
 ├── metadata.json                 id, имя, версия, категория
 ├── contents/ui/main.qml          Апплет: полное представление + зеркало для панели
 ├── contents/ui/components/
+│   ├── qmldir                    Объявляет модуль org.koda.lofiplayer и синглтон StreamPlayer
 │   ├── StreamPlayer.qml          QML-синглтон: MediaPlayer, станции, опрос названий
-│   └── PlayerCard.qml            Визуальная карточка (независима от Plasma, загружается через qml6)
+│   └── PlayerCard.qml            Визуальная карточка (не зависит от Plasma)
 
 helper/
 ├── lofi-nowplaying.py            Метаданные Icecast -> JSON на localhost
@@ -128,7 +129,32 @@ helper/
 install.sh, uninstall.sh
 ```
 
-`PlayerCard.qml` намеренно не импортирует ничего из Plasma, кроме Kirigami, поэтому вы можете отлаживать внешний вид с помощью обычного `qml6`, не перезапуская plasmashell.
+`PlayerCard.qml` намеренно не импортирует ничего из Plasma, только QtQuick и Kirigami, поэтому её можно отлаживать вне plasmashell. Учтите, что каталог `components/` содержит `qmldir` с объявлением синглтона `StreamPlayer`, поэтому простой команды `qml6 PlayerCard.qml` недостаточно — нужен небольшой QML-файл-обёртка в том же каталоге:
+
+```qml
+// preview-wrapper.qml — положить рядом с PlayerCard.qml
+import QtQuick
+import QtQuick.Window
+
+Window {
+    width: 296
+    height: 452
+    visible: true
+    PlayerCard {
+        anchors.fill: parent
+        previewActive: true
+        previewPlaying: true
+        previewArtist: "dryhope"
+        previewTitle: "Shade"
+    }
+}
+```
+
+```bash
+qml6 package/contents/ui/components/preview-wrapper.qml
+```
+
+Свойства `previewActive` / `previewPlaying` / `previewTitle` / `previewArtist` включают «статичный» режим карточки без движка: так отображаются заданные значения вместо обращений к `null`-движку. Тот же механизм main.qml использует для зеркала на панели.
 
 ## Решение проблем
 
